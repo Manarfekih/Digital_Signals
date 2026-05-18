@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Digital Signals — Mental Wellness Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="home-page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <a href="/" style="text-decoration:none;color:inherit">
+        <span class="logo-wave">〜</span> Digital Signals
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link active">Home</a>
+      <a href="/analyze" class="nav-link">Check In</a>
+      <a href="/dashboard" class="nav-link">Word Insights</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+      <div class="dots-grid"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">🏫 For Students & Counselors</div>
+      <h1 class="hero-title">
+        Your feelings<br/>
+        <em>deserve</em> to be<br/>
+        <span class="title-highlight">heard.</span>
+      </h1>
+      <p class="hero-sub">
+        Share your thoughts in writing, and our gentle tool helps you understand 
+        how you're feeling — so you can get the right support, when you need it.
+      </p>
+      <div class="hero-actions">
+        <a href="/analyze" class="btn btn-primary">
+          <span>Start Your Check-In</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <a href="/dashboard" class="btn btn-ghost">See How It Works</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="signal-card card-float-1">
+        <div class="signal-dot green"></div>
+        <span>Feeling hopeful today 🌟</span>
+      </div>
+      <div class="signal-card card-float-2">
+        <div class="signal-dot amber"></div>
+        <span>A little overwhelmed lately</span>
+      </div>
+      <div class="signal-card card-float-3">
+        <div class="signal-dot green"></div>
+        <span>Talked with my counselor — it helped</span>
+      </div>
+      <div class="central-orb">
+        <div class="orb-ring r1"></div>
+        <div class="orb-ring r2"></div>
+        <div class="orb-ring r3"></div>
+        <div class="orb-core">💚</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer-banner">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>This tool is for <strong>early awareness only</strong> — not a diagnosis. 
+    Always talk with a counselor or trusted adult for support decisions.</span>
+  </div>
+
+  <!-- WHAT IS THIS -->
+  <section class="section section-what">
+    <div class="container">
+      <div class="section-label">How It Helps</div>
+      <h2 class="section-title">Understanding feelings through words</h2>
+      <p class="section-desc">
+        Many young people express emotions through writing. Digital Signals gently 
+        reads those words and helps identify when someone might benefit from extra support.
+      </p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feat-icon">🔍</div>
+          <h3>Gentle Pattern Recognition</h3>
+          <p>Our tool notices emotional patterns in writing — like a caring listener who pays attention to how words connect.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">💬</div>
+          <h3>Clear, Kind Results</h3>
+          <p>See which words stood out and what they might mean — explained in simple, supportive language.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">🛡️</div>
+          <h3>Privacy First</h3>
+          <p>Your words stay with you. Nothing is stored or shared. This is a safe space to explore your feelings.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">🎯</div>
+          <h3>Three Levels of Support</h3>
+          <p>Feeling Well • Some Concerns • Needs Support — with gentle guidance for each.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IS THIS FOR -->
+  <section class="section section-who">
+    <div class="container">
+      <div class="who-grid">
+        <div class="who-text">
+          <div class="section-label">For everyone</div>
+          <h2 class="section-title">You are not <em>alone</em></h2>
+          <p>Whether you're a student navigating big feelings, or a counselor wanting to reach every student — Digital Signals helps bridge that gap with care.</p>
+          <ul class="who-list">
+            <li>
+              <span class="check">✓</span>
+              <div><strong>Students</strong> can share how they feel through writing — no pressure, just honesty.</div>
+            </li>
+            <li>
+              <span class="check">✓</span>
+              <div><strong>Counselors</strong> get gentle insights to know who might need a conversation sooner.</div>
+            </li>
+            <li>
+              <span class="check">✓</span>
+              <div><strong>Schools</strong> can build a culture where mental wellness is talked about openly and early.</div>
+            </li>
+          </ul>
+          <a href="/analyze" class="btn btn-primary" style="margin-top:2rem">Start Your Check-In →</a>
+        </div>
+        <div class="who-visual">
+          <div class="stat-cards">
+            <div class="stat-card">
+              <div class="stat-number">1 in 5</div>
+              <div class="stat-label">young people experience emotional challenges each year</div>
+            </div>
+            <div class="stat-card stat-accent">
+              <div class="stat-number">50%</div>
+              <div class="stat-label">of emotional patterns begin before age 14</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">Early awareness</div>
+              <div class="stat-label">makes support more effective and kind</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-cta">
+    <div class="container">
+      <div class="cta-box">
+        <div class="cta-glow"></div>
+        <h2>Ready to listen more deeply?</h2>
+        <p>Share a few sentences about how you're feeling. Get gentle insights in seconds.</p>
+        <div class="cta-actions">
+          <a href="/analyze" class="btn btn-primary btn-large">Start Your Check-In</a>
+          <a href="/dashboard" class="btn btn-ghost btn-large">See Word Insights</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="logo-wave">〜</span> Digital Signals
+          <p>A caring tool for early mental wellness awareness in schools.</p>
+        </div>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="/analyze">Check In</a>
+          <a href="/dashboard">Word Insights</a>
+        </div>
+        <div class="footer-note">
+          ⚠️ Not a medical tool. For awareness & counseling support only.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>

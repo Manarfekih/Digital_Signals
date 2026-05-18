@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Insights — Digital Signals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dashboard-page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <a href="/" style="text-decoration:none;color:inherit">
+        <span class="logo-wave">〜</span> Digital Signals
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/analyze" class="nav-link">Check In</a>
+      <a href="/dashboard" class="nav-link active">Word Insights</a>
+    </div>
+  </nav>
+
+  <main class="dashboard-main">
+    <div class="dashboard-header">
+      <div class="section-label">Understanding your words</div>
+      <h1>Word <em>Insights</em> Dashboard</h1>
+      <p>See which words stood out in your message — and how they connect to your wellness snapshot.</p>
+    </div>
+
+    <!-- Input Row -->
+    <div class="dash-input-row">
+      <textarea
+        id="dashInput"
+        class="dash-textarea"
+        placeholder="Paste the same words you shared earlier (or new thoughts) to see which ones mattered most..."
+        rows="4"
+      ></textarea>
+      <button id="dashBtn" class="btn btn-primary" onclick="runDashboard()">
+        <span id="dashBtnText">Show Word Insights</span>
+        <div id="dashSpinner" class="btn-spinner hidden"></div>
+      </button>
+    </div>
+    <div class="dash-samples">
+      Try: 
+      <button class="sample-btn" onclick="loadDashSample('low')">Feeling okay</button>
+      <button class="sample-btn" onclick="loadDashSample('moderate')">A bit heavy</button>
+      <button class="sample-btn" onclick="loadDashSample('high')">Really struggling</button>
+    </div>
+
+    <!-- Dashboard Content (hidden until result) -->
+    <div id="dashContent" class="dash-content hidden">
+
+      <!-- Top Row: Prediction + Probabilities + Stats -->
+      <div class="dash-top-row">
+
+        <!-- Prediction Card -->
+        <div class="dash-card prediction-card">
+          <div class="card-label">Your wellness snapshot</div>
+          <div class="pred-display">
+            <div class="pred-emoji" id="dashEmoji"></div>
+            <div>
+              <div class="pred-level" id="dashLevel"></div>
+              <div class="pred-sub">Based on your words</div>
+            </div>
+          </div>
+          <div class="model-pill">
+            <div class="model-pill-dot lr-dot"></div>
+            Gentle pattern recognition
+          </div>
+        </div>
+
+        <!-- Probability Donut -->
+        <div class="dash-card donut-card">
+          <div class="card-label">Confidence levels</div>
+          <div class="donut-wrap">
+            <canvas id="donutChart" width="200" height="200"></canvas>
+            <div class="donut-center">
+              <div class="donut-pct" id="donutPct"></div>
+              <div class="donut-cls" id="donutCls"></div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-row"><span class="legend-dot" style="background:#22c55e"></span>Feeling Well <span id="legendLow" class="legend-val"></span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#f59e0b"></span>Some Concerns <span id="legendMod" class="legend-val"></span></div>
+            <div class="legend-row"><span class="legend-dot" style="background:#ef4444"></span>Needs Support <span id="legendHigh" class="legend-val"></span></div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="dash-card stats-card">
+          <div class="card-label">About your message</div>
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span class="stat-icon">📝</span>
+              <span class="stat-name">Words shared</span>
+              <span class="stat-val" id="wordCount">—</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">🔤</span>
+              <span class="stat-name">Unique words</span>
+              <span class="stat-val" id="uniqueWords">—</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">✨</span>
+              <span class="stat-name">Words that stood out</span>
+              <span class="stat-val" id="impactfulCount">—</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">🎯</span>
+              <span class="stat-name">Confidence</span>
+              <span class="stat-val" id="predProb">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Word Impact Bars -->
+      <div class="dash-card shap-card">
+        <div class="card-label">
+          Which words mattered most
+          <span class="shap-tooltip-trigger" tabindex="0">?
+            <span class="shap-tooltip">Words that push toward your predicted level appear in red. Words that suggest lower concern appear in green. Bigger bar = stronger influence.</span>
+          </span>
+        </div>
+        <div class="shap-header-row">
+          <h3 id="shapTitle">Top words in your message</h3>
+          
+        </div>
+        <div id="shapBars" class="shap-bars-container"></div>
+        
+        <!-- Probability highlight for predicted class -->
+        <div style="margin-top:1.5rem; padding:1rem; background:var(--cream); border-radius:12px; border:1px solid var(--border);">
+          <div style="font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:8px;">
+            <span id="probEmoji">🎯</span>
+            <span>Confidence in this snapshot</span>
+          </div>
+          <div style="font-size:1.8rem; font-weight:700; color:var(--ink);" id="predProbDisplay">—</div>
+          <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;">
+            This is how confident we are that "<span id="predLabelDisplay">—</span>" reflects your current state.
+          </div>
+        </div>
+      </div>
+
+    
+
+        <!-- Counselor Guidance -->
+        <div class="dash-card counselor-card">
+          <div class="card-label">Gentle guidance</div>
+          <div id="dashGuidance" class="guidance-content"></div>
+          <div class="ethics-reminder">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            These insights are a starting point — real connection and professional care make the biggest difference.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashContent -->
+
+    <!-- Empty State -->
+    <div id="dashEmpty" class="dash-empty">
+      <div class="empty-icon">🔍</div>
+      <h3>Share your words to see insights</h3>
+      <p>Paste the same text you used in Check In, or write something new. We'll show which words stood out and why.</p>
+    </div>
+
+  </main>
+
+  <footer class="footer footer-slim">
+    <div class="container">
+      💙 Word insights are gentle guides — not diagnoses. Always pair them with conversation and care.
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check In — Digital Signals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="analyze-page">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <a href="/" style="text-decoration:none;color:inherit">
+        <span class="logo-wave">〜</span> Digital Signals
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/analyze" class="nav-link active">Check In</a>
+      <a href="/dashboard" class="nav-link">Word Insights</a>
+    </div>
+  </nav>
+
+  <main class="analyze-main">
+    <div class="analyze-header">
+      <h1>How are you feeling today?</h1>
+      <p>Share your thoughts in your own words. There are no right or wrong answers — just honesty.</p>
+    </div>
+
+    <div class="analyze-container">
+      <!-- Input Panel -->
+      <div class="input-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>✍️</span> Your words
+          </div>
+          <div class="char-counter"><span id="charCount">0</span> characters</div>
+        </div>
+        <textarea 
+          id="textInput" 
+          class="text-input" 
+          placeholder="You can write about your day, your worries, your hopes, or just whatever comes to mind..."
+          rows="6"
+        ></textarea>
+        <div class="input-actions">
+          <button id="analyzeBtn" class="btn btn-primary" onclick="analyzeText()">
+            <span id="btnText">Get Gentle Insights</span>
+            <div id="btnSpinner" class="btn-spinner hidden"></div>
+          </button>
+          <button class="btn-clear" onclick="clearInput()">Clear</button>
+          <div class="sample-btns">
+            <span class="sample-label">Try:</span>
+            <button class="sample-btn" onclick="loadSample('low')">Feeling okay</button>
+            <button class="sample-btn" onclick="loadSample('moderate')">A bit heavy</button>
+            <button class="sample-btn" onclick="loadSample('high')">Really struggling</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Panel -->
+      <div id="errorPanel" class="error-panel hidden">
+        <span class="error-icon">⚠️</span>
+        <span id="errorMsg"></span>
+      </div>
+
+      <!-- Result Panel -->
+      <div id="resultPanel" class="result-panel hidden">
+        <div class="result-header">
+          <h3>Your Wellness Snapshot</h3>
+          <div class="model-info">Gentle pattern recognition • Private & secure</div>
+        </div>
+
+        <!-- Risk Badge -->
+        <div class="risk-badge" id="riskBadge">
+          <div class="risk-emoji" id="riskEmoji"></div>
+          <div>
+            <div class="risk-level-text" id="riskLevelText"></div>
+            <div class="risk-sublabel">Based on your words</div>
+          </div>
+        </div>
+
+        <!-- Probabilities -->
+        <div class="prob-section">
+          <h4>How confident we are</h4>
+          <div class="prob-bars">
+            <div class="prob-row">
+              <span class="prob-label">🌿 Feeling Well</span>
+              <div class="prob-bar-wrap"><div class="prob-bar low-bar" id="lowBar"></div></div>
+              <span class="prob-pct" id="lowPct">—</span>
+            </div>
+            <div class="prob-row">
+              <span class="prob-label">💭 Some Concerns</span>
+              <div class="prob-bar-wrap"><div class="prob-bar mod-bar" id="modBar"></div></div>
+              <span class="prob-pct" id="modPct">—</span>
+            </div>
+            <div class="prob-row">
+              <span class="prob-label">🤝 Needs Support</span>
+              <div class="prob-bar-wrap"><div class="prob-bar high-bar" id="highBar"></div></div>
+              <span class="prob-pct" id="highPct">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guidance -->
+        <div id="guidanceBox" class="guidance-box"></div>
+
+        <!-- Actions -->
+        <div class="result-actions">
+          <a href="/dashboard" class="btn btn-ghost">See which words mattered →</a>
+          <button class="btn btn-ghost" onclick="copyResult()">Copy summary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-section">
+      <h3>How your check-in works</h3>
+      <div class="steps-flow">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text"><strong>You share</strong><br/>Write freely — no judgment</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text"><strong>We listen gently</strong><br/>Our tool notices emotional patterns</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text"><strong>You get clarity</strong><br/>A kind snapshot + gentle guidance</div>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text"><strong>Next steps</strong><br/>Decide if talking with someone feels right</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer footer-slim">
+    <div class="container">
+      💙 Your words matter. If you're struggling, please talk with a counselor or trusted adult. You deserve support.
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/analyze.js') }}"></script>
+</body>
+</html>
