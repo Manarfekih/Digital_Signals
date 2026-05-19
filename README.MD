@@ -211,7 +211,6 @@ This project adheres to strict ethical guidelines regarding AI in sensitive doma
 
 ## 🤝 Acknowledgements
 
-- **Academic Professor:** Mme. Rihab Laajili
 - **Data Sources:** Kaggle (Mental Health Sentiment, Suicide & Depression Detection, Mental Health Corpus), GitHub (Reddit Mental Health), Mendeley.
 - **Libraries:** Scikit-learn, TensorFlow, SHAP, NLTK, Flask.
 
