@@ -35,6 +35,7 @@ except ImportError:
     NLTK_AVAILABLE = False
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
 MAX_LEN = 200
 CLASSES = ['low_risk', 'moderate_risk', 'high_risk']
@@ -53,12 +54,18 @@ LR_PIPELINE_PATH  = os.path.join(MODEL_DIR, 'lr_best_pipeline.pkl')
 bilstm_model     = None
 bilstm_tokenizer = None
 lr_pipeline      = None
+_bilstm_expected_len = None
 
 def load_models():
-    global bilstm_model, bilstm_tokenizer, lr_pipeline
+    global bilstm_model, bilstm_tokenizer, lr_pipeline, _bilstm_expected_len
     if TF_AVAILABLE and os.path.exists(BILSTM_MODEL_PATH):
         try:
             bilstm_model = load_model(BILSTM_MODEL_PATH)
+            try:
+                # Commonly (None, seq_len) for Embedding input
+                _bilstm_expected_len = int(bilstm_model.input_shape[1])
+            except Exception:
+                _bilstm_expected_len = None
             print("BiLSTM loaded")
         except Exception as e:
             print(f"BiLSTM failed: {e}")
@@ -119,11 +126,35 @@ def predict_bilstm(raw_text: str):
     try:
         cleaned = preprocess_text(raw_text)
         seq     = bilstm_tokenizer.texts_to_sequences([cleaned])
-        padded  = pad_sequences(seq, maxlen=MAX_LEN, padding='post', truncating='post')
+        expected_len = _bilstm_expected_len or MAX_LEN
+        padded  = pad_sequences(seq, maxlen=expected_len, padding='post', truncating='post')
         proba   = bilstm_model.predict(padded, verbose=0)[0]
         pred_label = CLASSES[int(np.argmax(proba))]
         probs_dict = {CLASSES[i]: float(proba[i]) for i in range(len(CLASSES))}
         return pred_label, probs_dict, None
+    except Exception as e:
+        return None, None, str(e)
+
+
+# --- LR inference (no SHAP) ---
+def predict_lr(raw_text: str):
+    if lr_pipeline is None:
+        return None, None, "LR model not loaded"
+
+    try:
+        cleaned = preprocess_text(raw_text)
+        pred_label = lr_pipeline.predict([cleaned])[0]
+        proba = lr_pipeline.predict_proba([cleaned])[0]
+
+        clf = lr_pipeline.named_steps.get('clf')
+        classes = list(getattr(clf, 'classes_', CLASSES))
+        probs_dict = {cls: float(p) for cls, p in zip(classes, proba)}
+
+        # Ensure all expected classes exist for the frontend chart
+        for cls in CLASSES:
+            probs_dict.setdefault(cls, 0.0)
+
+        return str(pred_label), probs_dict, None
     except Exception as e:
         return None, None, str(e)
 
@@ -281,29 +312,70 @@ def dashboard():
     return render_template('dashboard.html')
 
 
-@app.route('/api/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST', 'GET'])
 def api_predict():
     rid  = uuid.uuid4().hex[:8]
     try:
-        data = request.get_json(silent=True) or {}
-        text = (data.get('text') or '').strip()
+        if request.method == 'GET':
+            text = (request.args.get('text') or '').strip()
+        else:
+            data = request.get_json(silent=True) or {}
+            text = (data.get('text') or '').strip()
         if len(text) < 10:
             return jsonify({'error': 'Please enter at least 10 characters.', 'request_id': rid}), 400
 
+        # Prefer BiLSTM when available; fall back to LR so the page still
+        # predicts even when TensorFlow isn't installed.
+        backend_used = None
+        backend_error = None
+
         label, probs, err = predict_bilstm(text)
-        if err or label is None:
-            label = 'low_risk'
-            probs = {'low_risk': 0.72, 'moderate_risk': 0.18, 'high_risk': 0.10}
+        if not (err or label is None):
+            backend_used = 'bilstm'
+        else:
+            backend_error = err
+            label, probs, err2 = predict_lr(text)
+            if not (err2 or label is None):
+                backend_used = 'lr'
+                backend_error = backend_error or err2
+            else:
+                backend_used = 'fallback'
+                backend_error = backend_error or err2
+                # Last-resort demo fallback (keeps UI functional)
+                label = 'low_risk'
+                probs = {'low_risk': 0.72, 'moderate_risk': 0.18, 'high_risk': 0.10}
+
+        if label not in LABEL_DISPLAY:
+            # Guard against unexpected label names from a mismatched pipeline
+            label = max(CLASSES, key=lambda k: float(probs.get(k, 0.0)))
 
         d = LABEL_DISPLAY[label]
         return jsonify({
             'label': label, 'label_text': d[0], 'color': d[1], 'emoji': d[2],
             'probabilities': probs, 'cleaned_text': preprocess_text(text),
             'request_id': rid,
+            'backend_used': backend_used,
+            'backend_error': backend_error,
         })
     except Exception:
         app.logger.exception("api_predict (%s)", rid)
         return jsonify({'error': 'Server error.', 'request_id': rid}), 500
+
+
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    return jsonify({
+        'tf_available': bool(TF_AVAILABLE),
+        'shap_available': bool(SHAP_AVAILABLE),
+        'nltk_available': bool(NLTK_AVAILABLE),
+        'bilstm_model_loaded': bilstm_model is not None,
+        'bilstm_tokenizer_loaded': bilstm_tokenizer is not None,
+        'bilstm_expected_len': _bilstm_expected_len,
+        'lr_pipeline_loaded': lr_pipeline is not None,
+        'bilstm_model_path_exists': os.path.exists(BILSTM_MODEL_PATH),
+        'tokenizer_path_exists': os.path.exists(TOKENIZER_PATH),
+        'lr_pipeline_path_exists': os.path.exists(LR_PIPELINE_PATH),
+    })
 
 
 @app.route('/api/insights', methods=['POST'])

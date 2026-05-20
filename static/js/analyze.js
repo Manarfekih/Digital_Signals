@@ -66,6 +66,7 @@ async function analyzeText() {
     try {
       const response = await fetch('/api/predict', {
         method: 'POST',
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })
       });
@@ -113,6 +114,12 @@ async function analyzeText() {
 
 // Render the results with teen-friendly display
 function renderResult(data) {
+  // Debug info (which model answered)
+  const modelInfoEl = document.querySelector('.model-info');
+  if (modelInfoEl && data.backend_used) {
+    modelInfoEl.textContent = `Model: ${data.backend_used}`;
+  }
+
   // Update risk badge
   document.getElementById('riskEmoji').textContent = data.emoji;
   document.getElementById('riskLevelText').textContent = data.label_text;
